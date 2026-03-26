@@ -1,0 +1,23 @@
+{
+  "skill_name": "biz-app-analyzer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我分析一下 /Users/mico/Micos/maidocha-dashboard 这个项目，生成 AI 知识库文档，让后续 AI 能快速理解这个项目",
+      "expected_output": "在项目 .ai-docs/ 目录下生成 4 份 Markdown 文件：PROJECT_CONTEXT.md（包含技术栈、目录结构、请求机制、路由权限、共享组件等完整上下文）、DEV_PATTERNS.md（包含 CRUD 等开发模式及参考页面）、MODULE_MAP.md（按业务模块列出每个页面的路由/API/Store/组件依赖）、GLOSSARY.md（业务术语和技术术语定义）",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我每次跟 AI 聊这个项目都要重新解释一遍技术栈和目录结构，太烦了。能不能帮我生成一套文档，以后 AI 读了就能直接干活？项目在 /Users/mico/Micos/maidocha-dashboard",
+      "expected_output": "同上，生成 4 份结构化文档。重点检查：PROJECT_CONTEXT.md 中对请求模式的描述是否足够详细（包括 proxy 模式和活动 API 模式的区分），DEV_PATTERNS.md 中是否提取了 CRUD 管理页面的标准模式并给出了参考页面路径",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "look at the project at /Users/mico/Micos/maidocha-dashboard and help me understand how it's structured. I want documentation that will help AI assistants work with this codebase effectively.",
+      "expected_output": "Same 4 documents generated. Key quality check: the analysis should work even when prompted in English, producing documents that accurately capture the Chinese-language business domain (guild management, soulstar activities, etc.) with proper term definitions in the glossary",
+      "files": []
+    }
+  ]
+}
