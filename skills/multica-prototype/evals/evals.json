@@ -1,0 +1,40 @@
+{
+  "skill_name": "multica-prototype",
+  "evals": [
+    {
+      "id": 1,
+      "scenario": "modify",
+      "prompt": "请为 guildAnchorManage/anchorChat/Overview.vue（主播聊天大盘）制作原型。需求：在表格中新增【是否违规】、【处置状态】（全部/待处理/已警告/已封禁/已忽略）两列，并在操作栏增加【处置记录】按钮，点击弹出抽屉展示处置历史。保留现有全部字段，仅需单方案原型。",
+      "expected_output": "在 multica-prototypes/guildAnchorManage/20260815_主播聊天处置.html 生成单个 HTML 原型文件。重点断言：1) 严格基于 agent/prototype 分支；2) 完整提取源码全部表格列，历史筛选项枚举精简为 3~5 项，新增两列及 4 个状态枚举 100% 精确还原；3) 抽屉交互在同文件内正常触发；4) 所有 el-table-column 显式闭合，无自闭合标签；5) 改动区域通过 CSS class 高亮，零文本干扰；6) 交付文件路径（绝对+相对）及 delta checklist，主动发起确认询问，用户确认前不执行 git commit",
+      "files": ["src/views/guildAnchorManage/anchorChat/Overview.vue"]
+    },
+    {
+      "id": 2,
+      "scenario": "new",
+      "prompt": "我们需要在运营模块下新增一个【公会活动激励结算】页面。核心字段包含：活动周期、公会ID、阶梯达标人数、预估激励金、结算状态。请提供 2 种不同的布局方案供业务方对比选择（方案 A 采用卡片指标大盘+明细表；方案 B 采用多 Tab 状态分流列表）。",
+      "expected_output": "在 multica-prototypes/operateManage/20260815_公会活动激励结算.html 生成单个 HTML 原型。重点断言：1) 准确识别多变体探索诉求（N=2），单 HTML 内置方案 A/B 并支持底部悬浮切换条（支持点击与键盘 1/2 快捷切换）；2) 侧边栏和 Tab 遵循 Lean Shell 精简规范；3) 自动适配 Vue 3 + Element Plus CDN；4) 严格单视图边界，不主动发散额外未请求页面",
+      "files": []
+    },
+    {
+      "id": 3,
+      "scenario": "migrate",
+      "prompt": "现有页面 guildData/guildOnelinkData.vue（OneLink 数据）将从【公会数据】大类迁移至【运营管理 -> 渠道投放 -> OneLink报表】。底层数据指标无改动，请生成一个迁移拓扑原型供产品和前端确认。",
+      "expected_output": "在 multica-prototypes/operateManage/20260815_OneLink报表迁移.html 生成单个 HTML 原型。重点断言：1) 识别为迁移场景，严禁重绘旧表格大量静态数据；2) 核心呈现“原层级路径 -> 迁移后新层级路径”的导航/Tab 拓扑对照卡片与指引；3) 正确推导目录归属至 operateManage",
+      "files": ["src/views/guildData/guildOnelinkData.vue"]
+    },
+    {
+      "id": 4,
+      "scenario": "modify_subview",
+      "prompt": "请为 guildData/anchor-data/index.vue（主播数据）制作原型。点击列表中任意主播的【查看详情】按钮，能够下钻查看该主播的详细聊天记录和历史会话。必须支持从详情页点击返回列表。",
+      "expected_output": "在 multica-prototypes/guildData/20260815_主播数据详情.html 生成单个 HTML 原型。重点断言：1) 严格遵循单 HTML 原则，严禁生成 detail.html 或使用 <a>/路由跨页跳转；2) 页面根组件内维护 mode: 'list' | 'detail' 状态机，点击操作列平滑切换并传递当前主播数据；3) 详情页包含清晰的【返回列表】操作",
+      "files": ["src/views/guildData/anchor-data/index.vue"]
+    },
+    {
+      "id": 5,
+      "scenario": "lifecycle_git",
+      "prompt": "【多轮流程测试】第1轮：为财务结算新增【月度返点账单】原型；第2轮：放弃该方案并清理，重新改为【季度公会对账单】（字段：季度、公会名称、已开票金额、打款状态）；第3轮：用户确认采纳。",
+      "expected_output": "全生命周期流程断言：1) 全程在 agent/prototype 分支操作；2) 第2轮收到废弃指令时，主动 rm -f 清理废弃的月度返点账单草稿文件；3) 第1轮与第2轮确认前绝不执行 git commit；4) 第3轮用户确认后，严格精准暂存 git add multica-prototypes/financeManage/20260815_季度公会对账单.html 后提交",
+      "files": []
+    }
+  ]
+}
