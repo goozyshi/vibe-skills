@@ -1,0 +1,65 @@
+{
+  "skill_name": "spec-context",
+  "evals": [
+    {
+      "id": "l0-skip",
+      "prompt": "把提交按钮的文字从「提交」改成「确认提交」。",
+      "expected_output": "判定 L0（仅 UI 文案）；直接改代码；不读 spec、不触发 review；汇报改了什么。"
+    },
+    {
+      "id": "l2-auto-review",
+      "prompt": "新增一个订单取消功能，支持取消原因选择和二次确认弹窗。",
+      "expected_output": "判定 L2（新增功能）；检索 index 无匹配 → 从用户消息自动提取 spec 并保存到 specs/active/，展示 spec 摘要；然后开始实现；完成后自动触发 review 对照验收标准；review 通过后设 dev-complete 并记录 dev_complete_sha。"
+    },
+    {
+      "id": "dev-complete-rollback",
+      "prompt": "新会话，继续上次的订单取消功能，发现有人改了 src/order/cancel.ts。",
+      "expected_output": "读取 index.json 找到 dev-complete 的 REQ-ORDER-001；git diff dev_complete_sha..HEAD -- related_files 有非空输出 → 回退为 active；向用户确认是否继续。"
+    },
+    {
+      "id": "cross-session-restore",
+      "prompt": "新会话，我要改一下订单列表的筛选逻辑。",
+      "expected_output": "读取 index.json（先于聊天历史）；用户提及的文件或关键词匹配到 active spec → 加载 spec 并确认是否继续；若无匹配 → 判定无关，按正常流程处理。"
+    },
+    {
+      "id": "init-idempotent",
+      "prompt": "已经初始化过 spec 系统的仓库，再执行 /init。",
+      "expected_output": "目录已存在 → 跳过；_template.md 已存在 → 跳过；AGENTS.md 标记间内容与模板一致 → ready，跳过；脚本版本相同 → 跳过；报告全部跳过。"
+    },
+    {
+      "id": "init-agents-conflict",
+      "prompt": "执行 /init，AGENTS.md 有 spec-system 标记但用户在标记间添加了自定义规则。",
+      "expected_output": "检测到 conflict（标记存在但内容与模板不一致）；展示差异；询问用户覆盖/合并/跳过；不自动覆盖。"
+    },
+    {
+      "id": "review-dedup",
+      "prompt": "刚完成 review 设了 dev-complete，没有新的代码改动，用户的下一条指令又触发了 L2 review。",
+      "expected_output": "检查 git rev-parse HEAD == dev_complete_sha 且 spec 未回退 → 跳过 review；告知用户代码未变化，沿用上次 review 结果。"
+    },
+    {
+      "id": "review-manual-override",
+      "prompt": "用户明确说 /review，即使代码没变。",
+      "expected_output": "手动 /review 始终执行，不受去重规则限制；重新收集 diff 并跑完整 review 流程。"
+    },
+    {
+      "id": "prd-to-spec-missing-info",
+      "prompt": "我要做一个用户积分兑换功能。",
+      "expected_output": "判定 L2；只提取用户明确提到的内容；关键缺失信息（兑换规则、积分来源、兑换上限等）放入待确认章节并询问用户；不添加推测性需求。"
+    },
+    {
+      "id": "skip-spec",
+      "prompt": "用户说 /skip-spec 然后要求重构一个内部模块。",
+      "expected_output": "记录跳过事实；按 L0 处理；不读 spec、不触发 review；告知用户已跳过 spec 流程。"
+    },
+    {
+      "id": "context-switch",
+      "prompt": "/context REQ-AUTH-002",
+      "expected_output": "在 index.json 中查找 REQ-AUTH-002；找到 → 加载为当前上下文；告知用户已切换；列出未完成验收标准；若 rejection_count > 0 则重置为 0。"
+    },
+    {
+      "id": "rejection-decay",
+      "prompt": "新会话，AI 提示恢复 REQ-ORDER-001，用户说「不继续」。已经是第三次拒绝。",
+      "expected_output": "递增 spec 的 rejection_count 至 3；本会话不再提示该 spec；后续会话 rejection_count >= 3 → 不再主动提示（仍可通过 /find-spec 或 /status 查看）。"
+    }
+  ]
+}
