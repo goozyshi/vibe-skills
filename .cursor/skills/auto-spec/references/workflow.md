@@ -103,8 +103,8 @@ in_scope 代码落地后，对照 change 内验收（tasks + delta specs）逐�
 1. `<openspec> validate <name> --strict --json` 收集结构校验结果（只查结构，不作审查结论）。
 2. 派独立子代理，任务含：
    - 需求一致性：逐条对照 tasks / delta specs 与代码 diff。
-   - 代码质量：按 [#skill-discovery](#skill-discovery) 解析指令来源——环境命中的 review skill 优先，无命中用内置 [code-reviewer 快照](code-reviewer/SKILL.md)。**不允许跳过**。
-3. 子代理只输出发现项，不实施修复（跳过 code-reviewer 第 7 步的确认交互）；修复由实现 agent 执行。问题级别映射：`P0/P1 → 阻塞，P2 → 警告，P3 → 建议`。
+   - 代码质量：按 [#skill-discovery](#skill-discovery) 解析指令来源——环境命中的 review skill 优先，无命中用内置清单 [review/](review/)（四份全量加载：code-quality / security / solid / removal-plan）。**不允许跳过**。
+3. 子代理只输出发现项，不实施修复；修复由实现 agent 执行。问题级别映射：`P0/P1 → 阻塞，P2 → 警告，P3 → 建议`。
 4. 有阻塞项 → 修复后重新派子代理审查，最多 3 轮；本轮问题数 ≥ 上一轮 → 不收敛，立即终止上报。
 5. 通过 → sidecar 设 `status: dev-complete`，记录 `dev_complete_sha`（当前 HEAD）。
 
@@ -173,16 +173,16 @@ Review 子代理的指令来源，运行时扫描（不持久化）：
 2. <workspace>/.agents/skills/
 3. ~/.cursor/skills-cursor/
 4. ~/.agents/skills/
-5. 内置兜底：<workspace>/.cursor/skills/auto-spec/references/code-reviewer/
+5. 内置兜底：<workspace>/.cursor/skills/auto-spec/references/review/
 ```
 
-| 角色     | 匹配关键词                    | 无命中时                |
-| -------- | ----------------------------- | ----------------------- |
-| 代码质量 | `code-review`, `reviewer`     | 内置 code-reviewer 快照 |
-| 安全     | `security`, `review-security` | 内置快照的安全清单      |
-| Bug      | `bugbot`, `bug`               | 内置快照的质量清单      |
+| 角色     | 匹配关键词                    | 无命中时                 |
+| -------- | ----------------------------- | ------------------------ |
+| 代码质量 | `code-review`, `reviewer`     | 内置清单（code-quality） |
+| 安全     | `security`, `review-security` | 内置清单（security）     |
+| Bug      | `bugbot`, `bug`               | 内置清单（code-quality） |
 
-环境命中优先于内置快照——用户自己维护的 code-reviewer 永远赢；内置副本是分发快照，不手改，漂移靠环境版覆盖。skill 决定子代理**怎么审**，不决定**审不审**。
+环境命中优先于内置清单——用户自己维护的 review skill 永远赢。内置清单是 floor（必查项下限），环境 skill 是 ceiling（深度上限）。skill 决定子代理**怎么审**，不决定**审不审**。
 
 ---
 

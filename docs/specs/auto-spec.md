@@ -256,7 +256,7 @@ OpenSpec 原生 slash（`/opsx-propose` 等）保留，手动 override 自动 sc
 - Fork 或 patch `@fission-ai/openspec` 源码
 - 修改 `openspec-*` 官方 skill 正文
 - 双轨并存 `specs/active/` 与 `openspec/changes/`
-- 替代 code-reviewer / review-security（仅编排委托；`references/code-reviewer/` 为分发快照作兜底，环境命中优先）
+- 替代 code-reviewer / review-security（仅编排委托；`references/review/` 内置清单作 floor 兜底，环境命中优先）
 
 ---
 

@@ -40,4 +40,4 @@ OpenSpec 原生 slash（`/opsx-propose` 等）保留，手动 override 自动 sc
 | Workflow | [references/workflow.md](references/workflow.md) |
 | OpenSpec 桥接 | [references/openspec-bridge.md](references/openspec-bridge.md) |
 | Sidecar schema | [references/sidecar-schema.md](references/sidecar-schema.md) |
-| 内置 review 兜底 | [references/code-reviewer/](references/code-reviewer/SKILL.md)（环境 skill 优先，快照不手改） |
+| 内置 review 清单 | [references/review/](references/review/)（floor 兜底；环境 skill 优先） |

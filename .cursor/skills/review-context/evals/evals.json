@@ -1,0 +1,89 @@
+{
+  "skill_name": "review-context",
+  "evals": [
+    {
+      "id": "implementation-entry",
+      "prompt": "完成 Dashboard 2.45 需求：新增筛选项和列表字段，后端协议还没定，你自行拟定字段。",
+      "expected_output": "先 Read review-context skill；执行 setup 创建任务契约并在首条回复给出契约路径；无契约前不改应用代码；字段协议写入契约 requirements 或 decisions；in_scope 代码落地后同轮对照 acceptance_criteria 执行 check，substantially met 时自动 review（phase=verification）并报告审查摘要，不等用户说提交。",
+      "files": []
+    },
+    {
+      "id": "implementation-exit-auto-review",
+      "prompt": "Dashboard 2.45 筛选项和列表字段已改完，对照契约验收一下。",
+      "expected_output": "读取活跃契约；逐条对照 acceptance_criteria 给出 met/partial/unmet；substantially met 时同轮触发 scoped review（phase=verification）；将 criterion  verdict 与 review 摘要写入契约；用户-facing 响应含审查结论与 P0-P3 计数。",
+      "files": []
+    },
+    {
+      "id": "high-risk-implementation",
+      "prompt": "实现一个涉及权限校验和共享 API 的功能，并说明实现阶段已完成。",
+      "expected_output": "识别为高风险；读取或创建任务契约；in_scope 代码落地后同轮 check + review（phase=verification）；记录 per-criterion verdict 与 review 摘要；不等用户说提交。",
+      "files": []
+    },
+    {
+      "id": "low-risk-filter",
+      "prompt": "只修改 README 中的拼写、注释和格式，不改变行为，然后请求交接。",
+      "expected_output": "识别为纯文档 in_scope、无应用代码；在契约记录 review_skipped_reason；可跳过 review；继续验证交接字段。",
+      "files": []
+    },
+    {
+      "id": "pre-commit-review",
+      "prompt": "功能实现和测试都完成了，现在准备提交。",
+      "expected_output": "进入 pre-commit 检查；计算 change_snapshot_hash；hash 与上次 review 相同则 dedup 跳过；hash 变化则再跑 scoped review；检查 P0/P1 阻断。",
+      "files": []
+    },
+    {
+      "id": "cross-session-recovery",
+      "prompt": "新会话继续这个分支上的工作，不要依赖之前的聊天记录。",
+      "expected_output": "按契约路径、task_id、branch、PR/Issue 顺序恢复唯一任务；报告当前阶段、范围、风险、发现项、未决问题和下一道门槛。",
+      "files": []
+    },
+    {
+      "id": "requirement-change",
+      "prompt": "需求新增了一个导出权限限制，请同步任务上下文。",
+      "expected_output": "追加 requirement-change 事件；不改写旧历史；重新计算受影响的验收标准、审查范围和风险提示；标记需要确认的事项。",
+      "files": []
+    },
+    {
+      "id": "review-persistence",
+      "prompt": "对当前任务执行一次审查，并保留结果供下个模型继续。",
+      "expected_output": "只向 code-reviewer 传递 task_id、phase、requirements、acceptance_criteria、in_scope、out_of_scope、risk_hints、previous_findings 和 change_snapshot_hash；保留完整报告，并将摘要、P0-P3 数量、hash 和未解决项追加到契约。",
+      "files": []
+    },
+    {
+      "id": "p0-p1-block",
+      "prompt": "审查发现一个 P1 权限绕过问题，现在准备交接。",
+      "expected_output": "将交接标记为 BLOCKED；保持任务未关闭；明确 P1 数量和未解决项；不以 P2/P3 的处理方式放行。",
+      "files": []
+    },
+    {
+      "id": "identity-conflict",
+      "prompt": "当前分支匹配两个任务契约，但两个契约的 task_id 和需求不同。",
+      "expected_output": "暂停自动选择并请求用户确认；记录身份冲突；不覆盖契约、不替换 branch、不执行审查或交接。",
+      "files": []
+    },
+    {
+      "id": "bootstrap-missing",
+      "prompt": "首次在这个仓库接入 review-context，执行 setup；AGENTS.md 没有审查门槛，CLAUDE.md 没有 @AGENTS.md。",
+      "expected_output": "先运行 bootstrap 检查；报告 needs-bootstrap；展示精确补充内容并请求授权；未授权前不修改共享规则文件。",
+      "files": []
+    },
+    {
+      "id": "bootstrap-idempotent",
+      "prompt": "仓库已经接入 review-context，再次执行 setup 创建一个新任务。",
+      "expected_output": "检查结果为 ready；不追加第二份 AGENTS 门槛、不重写 CLAUDE.md；只创建或规范化任务契约。",
+      "files": []
+    },
+    {
+      "id": "bootstrap-conflict",
+      "prompt": "AGENTS.md 存在不完整的 review-context bootstrap 标记，执行 setup。",
+      "expected_output": "报告 conflict 并暂停；不覆盖已有规则，不创建契约，等待用户处理冲突。",
+      "files": []
+    },
+    {
+      "id": "language-following",
+      "prompt": "我用中文执行 /review-context handoff，请输出交接结果。",
+      "expected_output": "所有用户可见自然语言使用简体中文；保留 task_id、路径、YAML 字段、PASS/BLOCKED 和 P0-P3 等机器标识不翻译。",
+      "files": []
+    }
+  ]
+}
