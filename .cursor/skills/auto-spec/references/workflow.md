@@ -24,8 +24,8 @@ AGENTS.md gate 触发后加载本文。Slash 命令见 [commands/](../commands/)
 ```
 L0（无漂移，直接改）：
   - 样式/文案/错字/格式/注释/文档
-  - 修 bug —— 对齐 spec 或预期行为，不是改契约
-    （修复复杂或想留决策记录 → 可自愿升 L2）
+  - 修 bug —— 代码错、spec 对，改代码贴 spec
+    （spec 本身过时 → 见 [#spec-漂移](#spec-漂移)；修复复杂或想留决策记录 → 可自愿升 L2）
   - 非破坏性依赖更新
   - 不改变行为的配置调整（含 CI、日志级别）
   - 为现有行为补测试
@@ -34,6 +34,7 @@ L0（无漂移，直接改）：
 
 L1（可能触碰行为契约，需对照）：
   - 改动文件在任一 active change sidecar 的 related_files 中
+  - 改动值与现有 spec 记录值不一致 → 对照后按 [#spec-漂移](#spec-漂移) 分流
   - 共享/公共模块改动，且「行为不变」难自证
   - 纯性能 migration（如仅加索引）
   - 不确定 → 按 L1，对照 change 列表后再判升降
@@ -60,12 +61,40 @@ L1 发现影响可感知行为 → 升级为 L2。执行中复杂度超出初始
 
 ---
 
+## spec-漂移
+
+代码 ↔ spec 不一致分两个方向，处理完全不同：
+
+| 方向                    | 本质      | 处理              |
+| ----------------------- | --------- | ----------------- |
+| 代码错，spec 对         | bugfix    | L0，改代码贴 spec |
+| spec 旧，契约已被外部改 | spec 漂移 | 按下文分轨        |
+
+**分轨**（按 spec 状态与归属）：
+
+| 情形                                              | 处理                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------- |
+| 未归档，且覆盖该文件的 active change 属于当前任务 | 在该 change 内更新 delta specs + tasks，代码随动，不新开 change |
+| 未归档，但覆盖 change 属他人/无关任务             | 不并入他人 change，按已归档轨新开「契约同步」change             |
+| 已归档（主 spec 过时）                            | L2 开「契约同步」change：主 spec 更新与代码同 change 走         |
+| 纯笔误                                            | L1：直接补主 spec，提交信息记录修正原因                         |
+
+**Completion criterion**：回复列出被修改的 spec 文件路径，且其与代码变更同轮出现在 `git status`——声明「已更新 spec」不算数，落盘才算。
+
+**笔误 vs 契约变更判据**：存在外部变更来源（后端 PR、API 文档、对方通知）→ 契约变更；spec 记录与可观测现实不符且无任何外部变更来源 → 笔误；无法确定 → 按契约变更处理（重方向兜底）。
+
+**契约同步 change 的精简提案**：只写外部变更来源、旧值 → 新值、影响面，跳过 design。sidecar 与 review 流程同普通 L2，不豁免。
+
+**补票**：check 阶段才发现「代码对、spec 旧」时，代码已落地属既成事实——同轮补建契约同步 change（精简提案），把已落地 diff 纳入其验收，照常 review，回复中明示「补票」。补票是追认 + 完整审查，不是放行。
+
+---
+
 ## l2-setup
 
 无 active change 时，写 in_scope 代码之前：
 
 1. `<openspec> list --json`，按 sidecar 的 `related_files` / `keywords` 查找关联 change。
-2. 未找到 → 桥接 OpenSpec propose 流程（见 [openspec-bridge.md](openspec-bridge.md#propose-桥接)）：从用户消息提取标题、功能点、验收标准，生成 `openspec/changes/<name>/` 的 proposal / tasks / delta specs。PRD 清晰 → 跳过 explore，**不跳过** propose。
+2. 未找到 → 桥接 OpenSpec propose 流程（见 [openspec-bridge.md](openspec-bridge.md#propose-桥接)）：从用户消息提取标题、功能点、验收标准，生成 `openspec/changes/<name>/` 的 proposal / tasks / delta specs。PRD 清晰 → 跳过 explore，**不跳过** propose。契约同步类 change → 提案格式从简，见 [#spec-漂移](#spec-漂移)。
 3. 写入 sidecar `openspec/changes/<name>/.auto-spec.yaml`（`status: active`，填 `related_files`、`keywords`）。
 4. 展示 change 摘要，附注「change 已自动创建，实现完成后将按此验收。如需调整随时告知。」
 
@@ -86,13 +115,17 @@ L1 发现影响可感知行为 → 升级为 L2。执行中复杂度超出初始
 
 ## check
 
-in_scope 代码落地后，对照 change 内验收（tasks + delta specs）逐条检查。输出简表：
+in_scope 代码落地后，先 `git status` 核验：spec-漂移 场景下 spec 文件须与代码同轮变更，缺 spec 变更 → 阻塞项，回到 [#spec-漂移](#spec-漂移) 补齐后再对照。
+
+对照 change 内验收（tasks + delta specs）逐条检查。输出简表：
 
 ```
 | # | 验收标准 | 状态 | 说明 |
 ```
 
 基本满足 → 同轮自动执行 `review`。纯文档/格式任务 → 在 sidecar 记录 `review_skipped_reason`，不触发 review。
+
+对照中发现「代码对、spec 旧」→ 不判不通过，按 [#spec-漂移](#spec-漂移) 分流：契约变更 → 补票；笔误 → 直接补主 spec。
 
 ---
 
