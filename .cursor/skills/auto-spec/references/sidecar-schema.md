@@ -1,16 +1,16 @@
 # Sidecar Schema
 
-OpenSpec 原生无 `accepted` 状态机。schedule 层在 change 侧挂 sidecar 补齐：
+OpenSpec 原生无 `accepted` 状态机。schedule 层在项目根目录保存 state：
 
 ```
-openspec/changes/<name>/.auto-spec.yaml
+.auto-spec/changes/<name>.yaml
 ```
 
 ## 模板
 
 ```yaml
 status: active # active | dev-complete | accepted | cancelled
-dev_complete_sha: ""
+review_snapshot: ""
 rejection_count: 0
 related_files: [] # glob，如 src/foo/**
 keywords: []
@@ -20,17 +20,18 @@ updated: "" # ISO 日期
 
 ## 字段
 
-| 字段 | 设者 | 用途 |
-|------|------|------|
-| `status` | AI: `active`/`dev-complete`；人类: `accepted`/`cancelled` | 状态机，见 [workflow.md](workflow.md#状态机) |
-| `dev_complete_sha` | AI | review 去重与回退检测 |
-| `rejection_count` | AI | recover 提示衰减，≥ 3 不再主动提示 |
-| `related_files` | AI | recover / level 关联匹配 |
-| `keywords` | AI | recover 关联匹配 |
-| `review_skipped_reason` | AI | check 跳过 review 的审计记录 |
-| `updated` | AI | 排序与陈旧判断 |
+| 字段                    | 设者                                                                            | 用途                                         |
+| ----------------------- | ------------------------------------------------------------------------------- | -------------------------------------------- |
+| `status`                | AI: `active`/`dev-complete`；人类: `accepted`/`cancelled`                      | 状态机，见 [workflow.md](workflow.md#状态机) |
+| `review_snapshot`       | AI                                                                              | in_scope 内容快照；仅用于 review 去重        |
+| `rejection_count`       | AI                                                                              | recover 提示衰减，≥ 3 不再主动提示           |
+| `related_files`         | AI                                                                              | recover / level 关联匹配                     |
+| `keywords`              | AI                                                                              | recover 关联匹配                             |
+| `review_skipped_reason` | AI                                                                              | check 跳过 review 的审计记录                 |
+| `updated`               | AI                                                                              | 排序与陈旧判断                               |
 
 ## 规则
 
-- sidecar 是 schedule 层私有文件，`openspec archive` 不消费它；archive 前必须由人类把 `status` 设为 `accepted`。
-- 一个 change 一个 sidecar，与 change 同生命周期。
+- sidecar 是 schedule 层私有文件；不能驱动或替代 OpenSpec archive。
+- archive 前必须由人类设为 `accepted`。归档状态以 OpenSpec 的状态和 change 位置为准。
+- 一个 change 一个 state 文件；archive 成功后删除，历史由 OpenSpec archive 保留。

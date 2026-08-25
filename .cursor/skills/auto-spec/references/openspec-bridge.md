@@ -1,53 +1,66 @@
-# OpenSpec 桥接
+# OpenSpec 1.10 桥接
 
-schedule 层调 engine 的唯一入口。CLI 细节以此文件为准，workflow 不重复。
+**Engine owns artifacts.** schedule 层只调用 OpenSpec 1.10.0 的 CLI 与官方 skills；不复制 schema、DAG 或工件模板。
 
-## invoke 解析
+## 版本与调用
 
-按优先级解析 `<openspec>` 调用前缀：
+要求精确版本 `1.10.0`。先运行 `<openspec> --version`；不匹配则停止，要求执行 `/auto-spec init` 升级或降级。
+
+按优先级解析 `<openspec>`：
 
 ```
-1. 项目 `.auto-spec.yaml` 的 openspec.invoke
-2. package.json devDependencies 含 @fission-ai/openspec → `pnpm exec openspec`（按项目包管理器换 npx/yarn）
-3. 全局 `openspec`（PATH 可解析）
-4. 均不可用 → 停止，提示 `/auto-spec init`
+1. package.json devDependencies 必须精确包含 @fission-ai/openspec@1.10.0：
+   - pnpm：`pnpm exec openspec`
+   - npm：`npx --no-install openspec`
+   - yarn：`yarn openspec`
+   - bun：`bunx --no-install openspec`
+2. `.auto-spec.yaml` 的 openspec.invoke 仅在它是上述项目本地调用时采用
+3. 不满足 → 停止，提示 `/auto-spec init`
 ```
+
+调用 `init` 或 `update` 后再次运行 `<openspec> --version`；不是 `1.10.0` 则停止。
 
 ## CLI 命令表
 
-| 用途 | 命令 |
-|------|------|
+| 用途          | 命令                                         |
+| ------------- | -------------------------------------------- |
+| 配置 profile | `<openspec> config profile` |
 | 初始化 engine | `<openspec> init --tools <ids>` |
-| 列出 change | `<openspec> list --json` |
-| change 状态 | `<openspec> status --change <name> --json` |
-| 结构校验 | `<openspec> validate <name> --strict --json` |
-| 归档 | `<openspec> archive <name>` |
+| 生成官方 skills | `<openspec> update` |
+| 列出 change   | `<openspec> list --json`                     |
+| change 状态   | `<openspec> status --change <name> --json`   |
+| 结构校验      | `<openspec> validate <name> --strict --json` |
+| 归档          | `<openspec> archive <name> --yes`            |
+| 语义核验      | 调用官方 verify skill；不是 CLI 子命令        |
 
-CLI 参数以 `<openspec> --help` 输出为准；上表与本地版本不符时信环境。
+仅在 1.10.0 内，CLI 参数以 `<openspec> --help` 为准。
 
-## 工具 invoke 表
+## 官方 skills
 
-`openspec init --tools` 生成的官方 slash，按工具 ID 映射：
+custom profile 由 `<openspec> config profile` 选择。auto-spec 的最小集是 `propose`、`apply`、`verify`、`update`、`sync`、`archive`；`explore` 可选。调度层直接调用已生成的官方 skill；不要重写其内容。
 
-| 工具 | propose | apply | archive |
-|------|---------|-------|---------|
-| Cursor | `/opsx-propose` | `/opsx-apply` | `/opsx-archive` |
-| Claude | `/opsx:propose` | `/opsx:apply` | `/opsx:archive` |
-| Codex | `$openspec-propose` | `$openspec-apply` | `$openspec-archive` |
+Cursor 的官方命令名为 `/opsx-propose`、`/opsx-apply`、`/opsx-verify`、`/opsx-update`、`/opsx-sync`、`/opsx-archive`。其他工具使用初始化生成的等价命令。
+
+缺少最小集时停止 L2：重新配置 custom profile 包含缺失 skill，再运行 `<openspec> update`。
 
 ## propose 桥接
 
-workflow `l2-setup` 第 2 步按以下顺序选择：
+workflow `setup` 只走此链路：
 
-1. 当前工具的官方 propose slash 可用 → 调用之，传入从用户消息提取的结构化内容。
-2. 不可用 → 直接按 OpenSpec 目录约定手写 `openspec/changes/<name>/` 的 `proposal.md` / `tasks.md` / delta specs，再用 `<openspec> validate <name> --strict` 校验。
+1. 调用当前工具初始化生成的官方 `propose`。
+2. 不可调用时，提示重新配置 custom profile 补齐缺失 skill，并运行 `<openspec> update` 后复验版本。
+3. 仍不可调用时停止，提示运行 `/auto-spec init`。
 
-## devDep vs 全局
+禁止手写 change 目录中的 OpenSpec 工件。官方 skill 是 schema 与依赖的唯一来源。
 
-- 团队项目 → devDep（`package.json` 加 `@fission-ai/openspec`），版本锁定，CI 可复现。
-- 个人/多仓库复用 → 全局 `npm i -g @fission-ai/openspec`。
-- 选择结果写入 `.auto-spec.yaml` 的 `openspec.invoke`，后续会话不再检测。
+`sync` 由 custom profile 提供以支持完整归档链路；auto-spec 不自动提前合并。用户显式请求提前合并时，调用官方 sync skill。
+
+## 安装方式
+
+- 团队项目：devDependency 精确锁定 `@fission-ai/openspec@1.10.0`，CI 可复现。
+- auto-spec 只支持项目 devDependency，保证 engine 与 CI 同版本。
+- 将调用前缀、工具 ID 与版本写入 `.auto-spec.yaml`。
 
 ## 红线
 
-不手改 `openspec-*` 官方 skill 正文；官方产物由 `openspec init` / `openspec update` 管理。自定义逻辑只放 `auto-spec` / `auto-spec-*`。
+不手改 `openspec-*` 官方 skill 正文。官方产物由 `openspec init` 管理；自定义逻辑只放 `auto-spec`。
