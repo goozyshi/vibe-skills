@@ -30,7 +30,16 @@
 
 已有 `openspec/` 不覆盖 specs/changes。
 
-列出六个 required skills 与当前工具 commands 的 `present / missing`。缺失时展示“重新配置 profile”确认卡片；选中后运行 `config profile → update` 并重新检查。
+用户输出不用 `custom profile`。能力名使用 OpenSpec 原始标识：
+
+`explore` / `propose` / `apply` / `verify` / `update` / `sync` / `archive`
+
+按实际生成的 skill 与 command 分两组报告：
+
+- **已接入**：可由当前工具调用的能力及其命令。
+- **未接入**：未生成的能力、它缺少的工作环节，以及是否阻断完整变更链路。
+
+`propose`、`apply`、`verify`、`update`、`sync`、`archive` 缺失时展示“修复 OpenSpec 变更链路”确认卡片；`explore` 未接入只提示可选增强。选中修复后运行 `config profile → update` 并重新检查。
 
 完成标志：`openspec/` 存在，且每个已选工具的官方 `propose`、`apply`、`verify`、`update`、`sync`、`archive` skills 可用；支持 slash 的工具还生成对应 commands。
 
@@ -96,6 +105,6 @@ acceptance:
 
 向用户输出：
 
-- Phase A：OpenSpec 精确版本、安装方式、profile/skill/command 自检、init 结果、tools、context 填充结果（含留空字段）
+- Phase A：OpenSpec 精确版本、安装方式、变更链路能力自检、init 结果、tools、context 填充结果（含留空字段）
 - Phase B：skill 安装路径、AGENTS.md 状态（ready/needs-inject/conflict 及处理）、桥接状态、`.auto-spec.yaml` 是否写入
 - B5 发现的 skill 与未匹配角色的回退说明
