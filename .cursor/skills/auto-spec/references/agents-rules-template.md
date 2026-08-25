@@ -12,7 +12,7 @@ Gate 只写触发条件；workflow 细节在 skill 内，按需加载。
 
 收到实现、修复、重构、新功能、接口变更、续开发类任务时，读 `.cursor/skills/auto-spec/SKILL.md`（`.agents/skills/auto-spec/SKILL.md` 亦可），按 continuity 命令执行。纯调研/Q&A 除外。
 
-1. **改动前先分级** — `level`。首条回复 `[Spec: L0|L1|L2]`。L1 只读调查，写入前必须显式重分级为 L0 或 L2，并说明依据、spec 状态和下一步；L2 无 change 契约禁止写 in_scope 代码（`/skip-spec` 除外）。
+1. **改动前先分级** — `level`。首条回复 `[Spec: L0|L1|L2]`。先执行 contract test：消费者能力改变为 L2；全部不受影响为 L0；无法证明为 L1。生成物继承父变更等级。L1 只读调查，写入前必须显式重分级为 L0 或 L2，并说明依据、spec 状态和下一步；L2 无 change 契约禁止写 in_scope 代码（`/skip-spec` 除外）。
 
 2. **L2 先 planning** — `setup`（无 change）或 `start`（续 change）。官方 propose 回合只完成规划；回复须点名 change 名称并等待后续继续。
 
