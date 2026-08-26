@@ -1,6 +1,6 @@
 ---
 name: auto-spec
-description: Dispatches OpenSpec for implementation and behavior changes: classifies L0/L1/L2, routes L2 to official skills, and schedules evidence, review, and handoff.
+description: "Dispatches OpenSpec for implementation and behavior changes: classifies L0/L1/L2, routes L2 to official skills, and schedules evidence, review, and handoff."
 ---
 
 # Auto-Spec
@@ -20,15 +20,15 @@ description: Dispatches OpenSpec for implementation and behavior changes: classi
 
 ## Continuity 命令
 
-| 命令      | 用途                                      |
-| --------- | ----------------------------------------- |
+| 命令      | 用途                                       |
+| --------- | ------------------------------------------ |
 | `level`   | 分级并决定是否进入 OpenSpec                |
-| `setup`   | L2 无 active change → 调用官方 propose    |
+| `setup`   | L2 无 active change → 调用官方 propose     |
 | `start`   | L2 有 active change → 读取状态并继续 apply |
-| `check`   | 收集当前快照的验证、任务与测试证据          |
-| `review`  | 按风险调度独立审查                          |
-| `handoff` | 报告可人工验收状态，不自动 archive          |
-| `recover` | 新会话定位相关 active change                |
+| `check`   | 收集当前快照的验证、任务与测试证据         |
+| `review`  | 按风险调度独立审查                         |
+| `handoff` | 报告可人工验收状态，不自动 archive         |
+| `recover` | 新会话定位相关 active change               |
 
 ## Slash 命令
 
@@ -40,8 +40,8 @@ OpenSpec 原生 slash（`/opsx-propose`、`/opsx-archive` 等）保留。archive
 
 ## 共享引用
 
-| 引用             | 文件                                                                        |
-| ---------------- | --------------------------------------------------------------------------- |
+| 引用             | 文件                                                                       |
+| ---------------- | -------------------------------------------------------------------------- |
 | AGENTS gate 模板 | [references/agents-rules-template.md](references/agents-rules-template.md) |
-| Review floor     | [references/review/](references/review/)                                    |
-| 行为 eval        | [evals/evals.json](evals/evals.json)                                        |
+| Review floor     | [references/review/](references/review/)                                   |
+| 行为 eval        | [evals/evals.json](evals/evals.json)                                       |
