@@ -1,0 +1,70 @@
+{
+  "skill_name": "auto-spec",
+  "evals": [
+    {
+      "id": "l0-bugfix",
+      "prompt": "登录失败时已定义应返回 401，但实现返回 500，修复它。",
+      "expected_output": "判定 L0：当前 spec 正确、代码违反 spec；直接修复，不创建 OpenSpec change，不独立 review。"
+    },
+    {
+      "id": "l1-reclassify",
+      "prompt": "调整共享日期格式化模块，先看看会不会影响其他功能。",
+      "expected_output": "先判定 L1；只读调查调用方、active changes、spec 和测试；在同一可执行请求中明确重分级为 L0 或 L2，不能以 L1 结束。"
+    },
+    {
+      "id": "l1-delete-capability-reclassifies-l2",
+      "prompt": "删除 biz-app-analyzer skill、其生成文档、配置引用和关联产物。调查确认它们只服务该 skill。",
+      "expected_output": "L1 调查确认范围后，识别 Agent 或开发者将失去可调用能力；终态重分级为 L2，调度官方 propose。不得以 L1 结束，也不得在 propose 前删除文件。"
+    },
+    {
+      "id": "l2-propose-before-apply",
+      "prompt": "新增用户导出数据的 API。",
+      "expected_output": "判定 L2；先调官方 propose，等待 planning complete；不手写 OpenSpec artifacts，不在 propose 回合调用 apply。"
+    },
+    {
+      "id": "normal-l2-final-review",
+      "prompt": "普通 L2 change 的 tasks 已完成 80%，没有高风险信号。",
+      "expected_output": "收集进度但不触发独立 review；仅在 tasks 100%、validate、verify 和要求的命令通过后调度一次 final review。"
+    },
+    {
+      "id": "high-risk-interim-review",
+      "prompt": "权限校验 L2 change 的 tasks 已完成 80%，当前代码快照尚未审查。",
+      "expected_output": "识别高风险；调度一次 interim review，检查方向、架构和高风险遗漏，并写入 interim_reviewed: true；不报告可人工验收。"
+    },
+    {
+      "id": "interim-review-once",
+      "prompt": "高风险 change 已完成一次 interim review，之后代码快照变化，任务进度仍为 85%。",
+      "expected_output": "不重复调度 interim review；interim_reviewed 已为 true。继续实现，等待 100% 后的 final review。"
+    },
+    {
+      "id": "interim-review-disabled",
+      "prompt": "高风险 L2 change 的 tasks 已完成 80%，但 .auto-spec.yaml 设置 high_risk_interim_review: false。",
+      "expected_output": "不调度 interim review；继续实现，等待 100% 后的 final review。"
+    },
+    {
+      "id": "review-dedup",
+      "prompt": "高风险 change 的相同代码快照已经完成 interim review，任务进度仍为 85%。",
+      "expected_output": "读取 schedule context；相同 snapshot 和 review type 时复用结果，不重复派 review。"
+    },
+    {
+      "id": "handoff-does-not-archive",
+      "prompt": "L2 change 的任务、验证、测试和 final review 都通过。",
+      "expected_output": "输出可人工验收的 handoff 及证据；不调用 sync 或 archive，由人决定官方 OpenSpec archive。"
+    },
+    {
+      "id": "incomplete-evidence",
+      "prompt": "普通 L2 change 的 tasks 已完成 100%，但 validate 或测试仍失败。",
+      "expected_output": "保持 active；报告缺失或失败证据；不调度 final review，不输出可人工验收。"
+    },
+    {
+      "id": "archive-remains-human",
+      "prompt": "用户明确执行 /opsx-archive 一个已通过 handoff 的 change。",
+      "expected_output": "不读取或设置 auto-spec acceptance 状态；让 OpenSpec 官方 archive 流程执行，后续 recover 以 OpenSpec archive 位置判断事实。"
+    },
+    {
+      "id": "recover-routing",
+      "prompt": "新会话要改用户导出功能，active change 的 related_files 或 keywords 命中。",
+      "expected_output": "先读 openspec list/status 和 schedule context；命中后调度 start。没有命中时不主动打扰。"
+    }
+  ]
+}

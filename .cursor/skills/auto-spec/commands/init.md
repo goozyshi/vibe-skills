@@ -81,25 +81,18 @@ Cursor 和 Codex 原生加载 `AGENTS.md`，无需桥接。
 不存在 → 写入：
 
 ```yaml
-version: "1.1"
+version: "1.2"
 openspec:
-  version: "1.10.0"
   invoke: "pnpm exec openspec" # A2 的实际解析结果
-  tools: [cursor] # A3 的实际工具 ID
 scheduling:
-  auto_propose_on_L2: true
-  auto_review_on_L2: true
-  review_max_iterations: 3
-  skip_explore_if_prd: true
-acceptance:
-  require_accepted_before_archive: true
+  high_risk_interim_review: true
 ```
 
-已存在 → 校验 `openspec.version` 为 `"1.10.0"`。缺失或不匹配时展示迁移补丁，未经确认不覆盖。
+已存在 → 校验 `version` 为 `"1.2"`，且不存在废弃的 `acceptance.require_accepted_before_archive`。不匹配时展示迁移补丁，未经确认不覆盖。
 
 ### B5. Skill 发现（运行时，不持久化）
 
-按 [workflow.md](../references/workflow.md#skill-discovery) 扫描可委托的 review skill，结果仅入报告。
+按 [review.md](../references/review.md) 的 review floor 扫描可委托的 review skill，结果仅入报告。
 
 ## 报告
 
