@@ -20,10 +20,17 @@ For an active related change:
 
 1. Read `<openspec> status --change <name> --json` and the schedule context.
 2. If planning is incomplete, dispatch the official next planning skill.
-3. If planning is complete, dispatch the official `apply` skill.
-4. When requirements change, dispatch the official `update` skill before applying more work.
+3. When requirements change, dispatch the official `update` skill before applying more work.
+4. If planning is complete, dispatch the official `apply` skill with a **return ticket**: after applying, it must return to auto-spec `check` before reporting implementation complete, handoff, or asking for review.
+5. Run `check` after every `apply` return. Load [review](review.md) for the evidence chain and review gate:
+   - completed tasks and passing evidence → dispatch `review` in the same turn;
+   - high-risk change, 80%–99% tasks, `high_risk_interim_review` enabled, and no interim review → dispatch interim review, then continue implementation;
+   - incomplete tasks or failed/missing evidence → continue implementation; do not hand off;
+   - review P0/P1 → return findings to official `apply`, then repeat `check`;
+   - unavailable review report → remain `BLOCKED`;
+   - final review passes → report handoff.
 
-**Completion criterion:** the official skill received the current change context.
+**Completion criterion:** the official skill received the current change context and returned through `check`; completed implementation has either a current final subagent review or an explicit `BLOCKED` result. A self-reported implementation completion does not end `start`.
 
 ## Boundaries
 

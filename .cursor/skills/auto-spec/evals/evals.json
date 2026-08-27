@@ -27,6 +27,21 @@
       "expected_output": "收集进度但不触发独立 review；仅在 tasks 100%、validate、verify 和要求的命令通过后调度一次 final review。"
     },
     {
+      "id": "completed-l2-requires-skilled-subagent-review",
+      "prompt": "普通 L2 change 的 tasks、validate、verify、测试、lint 和 build 均已通过。实现代理已经自检，但还没有独立 review。",
+      "expected_output": "同一回合调度独立子代理进行 final review。子代理必须先加载匹配的 code-reviewer 或安全审查 skill；自检不能替代。没有收到带 P0–P3 结论的子代理报告前，不能 handoff 或报告可人工验收。"
+    },
+    {
+      "id": "apply-return-triggers-review",
+      "prompt": "通过 auto-spec start 调度官方 apply。apply 刚完成最后一项 task，且实现代理准备报告“实现完成”。",
+      "expected_output": "apply 的 return ticket 要求先返回 auto-spec check。check 收集 status、validate、verify 和必需命令证据；证据完整时同回合调度 final 子代理 review。实现代理不能直接结束、hand off 或等待用户提醒 review。"
+    },
+    {
+      "id": "p0-p1-review-returns-to-apply",
+      "prompt": "L2 change 的 final review 发现 P1，当前代码快照未修复。",
+      "expected_output": "将发现项返回官方 apply 修复；不得用同一快照重复 review 或直接 handoff。修改后回到 check，再按规则 review。"
+    },
+    {
       "id": "high-risk-interim-review",
       "prompt": "权限校验 L2 change 的 tasks 已完成 80%，当前代码快照尚未审查。",
       "expected_output": "识别高风险；调度一次 interim review，检查方向、架构和高风险遗漏，并写入 interim_reviewed: true；不报告可人工验收。"
